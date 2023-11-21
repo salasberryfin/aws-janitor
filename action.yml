@@ -1,0 +1,24 @@
+name: 'AWS Janitor'
+author: 'Rancher Sandbox'
+description: 'Clean-up AWS resources based on a TTL.'
+inputs: 
+  regions:
+    description: 'A comma separated list of regions to clean resources in. You can use * for all regions.'
+    required: true
+  allow-all-regions:
+    description: 'Set to true if you want to allow cleaning resources in all regions. If true then * must be used for regions.'
+    required: false
+    default: 'false'
+  ttl:
+    description: 'The duration that a resource can live for. For example, use 24h for 1 day.'
+    required: true
+  commit:
+    description: 'Should the action just report or do the actual delete.'
+    required: false
+    default: 'false'
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/rancher-sandbox/aws-janitor:v0.1.0'
+branding:
+  icon: 'delete'
+  color: 'blue'
