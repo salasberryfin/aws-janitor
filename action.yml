@@ -18,7 +18,8 @@ inputs:
     default: 'false'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/rancher-sandbox/aws-janitor:v0.1.0'
+  image: 'docker://ghcr.io/salasberryfin/aws-janitor:v0.0.1-salasberryfin'
+  #image: 'docker://ghcr.io/rancher-sandbox/aws-janitor:v0.1.0'
 branding:
   icon: 'delete'
   color: 'blue'
