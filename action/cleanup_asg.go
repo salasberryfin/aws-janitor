@@ -17,10 +17,25 @@ func (a *action) cleanASGs(ctx context.Context, input *CleanupScope) error {
 		for _, asg := range page.AutoScalingGroups {
 			maxAge := asg.CreatedTime.Add(input.TTL)
 
+			var ignore bool
+			for _, tag := range asg.Tags {
+				if *tag.Key == input.IgnoreTag {
+					ignore = true
+					break
+				}
+			}
+
+			if ignore {
+				LogDebug("asg %s has ignore tag, skipping cleanup", *asg.AutoScalingGroupName)
+				continue
+			}
+
 			if time.Now().Before(maxAge) {
 				LogDebug("asg %s has max age greater than now, skipping cleanup", *asg.AutoScalingGroupName)
 				continue
 			}
+
+			LogDebug("adding asg %s to delete list", *asg.AutoScalingGroupName)
 			asgToDelete = append(asgToDelete, asg)
 		}
 

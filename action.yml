@@ -16,9 +16,14 @@ inputs:
     description: 'Should the action just report or do the actual delete.'
     required: false
     default: 'false'
+  ignore-tag:
+    description: 'The name of the tag that indicates a resource should not be deleted. Defaults to `janitor-ignore`'
+    required: false
+    default: 'janitor-ignore'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/rancher-sandbox/aws-janitor:v0.1.0'
+  image: 'docker://ghcr.io/salasberryfin/aws-janitor:v0.1.0-salasberryfin'
+  #image: 'docker://ghcr.io/rancher-sandbox/aws-janitor:v0.1.0'
 branding:
   icon: 'delete'
   color: 'blue'

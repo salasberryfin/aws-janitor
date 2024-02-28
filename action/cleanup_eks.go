@@ -22,12 +22,19 @@ func (a *action) cleanEKSClusters(ctx context.Context, input *CleanupScope) erro
 				continue
 			}
 
+			if _, ok := cluster.Cluster.Tags[input.IgnoreTag]; ok {
+				LogDebug("eks cluster %s has ignore tag, skipping cleanup", *name)
+				continue
+			}
+
 			maxAge := cluster.Cluster.CreatedAt.Add(input.TTL)
 
 			if time.Now().Before(maxAge) {
 				LogDebug("eks cluster %s has max age greater than now, skipping cleanup", *name)
 				continue
 			}
+
+			LogDebug("adding eks cluster %s to delete list", *name)
 			clustersToDelete = append(clustersToDelete, name)
 		}
 
@@ -84,7 +91,7 @@ func (a *action) deleteEKSCluster(ctx context.Context, clusterName string, clien
 		return fmt.Errorf("failed to delete cluster %s: %w", clusterName, err)
 	}
 
-	if err := client.WaitUntilClusterDeletedWithContext(ctx, &eks.DescribeClusterInput{}); err != nil {
+	if err := client.WaitUntilClusterDeletedWithContext(ctx, &eks.DescribeClusterInput{Name: &clusterName}); err != nil {
 		return fmt.Errorf("failed to wait for cluster %s to be delete: %w", clusterName, err)
 	}
 

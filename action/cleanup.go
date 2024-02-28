@@ -8,9 +8,10 @@ import (
 )
 
 type CleanupScope struct {
-	Session *session.Session
-	TTL     time.Duration
-	Commit  bool
+	Session   *session.Session
+	TTL       time.Duration
+	Commit    bool
+	IgnoreTag string
 }
 
 type CleanupFunc func(ctx context.Context, input *CleanupScope) error

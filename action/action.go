@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
+	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/eks"
 )
 
@@ -30,8 +31,9 @@ func (a *action) Cleanup(ctx context.Context, input *Input) error {
 
 	//NOTE: ordering matters here!
 	cleanupFuncs := map[string]CleanupFunc{
-		eks.ServiceName:         a.cleanEKSClusters,
-		autoscaling.ServiceName: a.cleanASGs,
+		cloudformation.ServiceName: a.cleanCfStacks,
+		eks.ServiceName:            a.cleanEKSClusters,
+		autoscaling.ServiceName:    a.cleanASGs,
 	}
 	inputRegions := strings.Split(input.Regions, ",")
 
@@ -47,9 +49,10 @@ func (a *action) Cleanup(ctx context.Context, input *Input) error {
 			}
 
 			scope := &CleanupScope{
-				TTL:     input.TTL,
-				Session: sess,
-				Commit:  input.Commit,
+				TTL:       input.TTL,
+				Session:   sess,
+				Commit:    input.Commit,
+				IgnoreTag: input.IgnoreTag,
 			}
 
 			Log("Cleaning up resources for service %s in region %s", service, region)
