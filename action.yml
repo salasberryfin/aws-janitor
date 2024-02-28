@@ -12,6 +12,10 @@ inputs:
   ttl:
     description: 'The duration that a resource can live for. For example, use 24h for 1 day.'
     required: true
+  pattern:
+    description: 'If a resource is found that matches the pattern, ttl will be ignored. It not passed, only ttl will be used.'
+    required: false
+    default: '\b\B'
   commit:
     description: 'Should the action just report or do the actual delete.'
     required: false

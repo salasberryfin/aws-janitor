@@ -13,6 +13,7 @@ type Input struct {
 	AllowAllRegion bool          `env:"INPUT_ALLOW-ALL-REGIONS"`
 	TTL            time.Duration `env:"INPUT_TTL"`
 	Commit         bool          `env:"INPUT_COMMIT"`
+	Pattern        string        `env:"INPUT_PATTERN"`
 }
 
 // NewInput creates a new input from the environment variables.

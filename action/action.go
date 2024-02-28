@@ -50,6 +50,7 @@ func (a *action) Cleanup(ctx context.Context, input *Input) error {
 				TTL:     input.TTL,
 				Session: sess,
 				Commit:  input.Commit,
+				Pattern: input.Pattern,
 			}
 
 			Log("Cleaning up resources for service %s in region %s", service, region)

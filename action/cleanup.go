@@ -11,6 +11,7 @@ type CleanupScope struct {
 	Session *session.Session
 	TTL     time.Duration
 	Commit  bool
+	Pattern string
 }
 
 type CleanupFunc func(ctx context.Context, input *CleanupScope) error

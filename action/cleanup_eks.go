@@ -3,6 +3,7 @@ package action
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/eks"
@@ -14,6 +15,12 @@ func (a *action) cleanEKSClusters(ctx context.Context, input *CleanupScope) erro
 	clustersToDelete := []*string{}
 	pageFunc := func(page *eks.ListClustersOutput, _ bool) bool {
 		for _, name := range page.Clusters {
+			match, err := regexp.MatchString(input.Pattern, *name)
+			if err != nil {
+				LogWarning("failed matching %s using pattern %s: %s", *name, input.Pattern, err)
+				continue
+			}
+
 			cluster, err := client.DescribeClusterWithContext(ctx, &eks.DescribeClusterInput{
 				Name: name,
 			})
@@ -25,8 +32,13 @@ func (a *action) cleanEKSClusters(ctx context.Context, input *CleanupScope) erro
 			maxAge := cluster.Cluster.CreatedAt.Add(input.TTL)
 
 			if time.Now().Before(maxAge) {
-				LogDebug("eks cluster %s has max age greater than now, skipping cleanup", *name)
-				continue
+				if !match {
+					LogDebug("eks cluster %s has max age greater than now and name does not match pattern, skipping cleanup", *name)
+					continue
+				}
+				LogDebug("eks cluster %s matches input pattern '%s', adding to list of clusters to delete", *name, input.Pattern)
+			} else {
+				LogDebug("eks cluster %s has max age less than now, adding to list of clusters to delete", *name)
 			}
 			clustersToDelete = append(clustersToDelete, name)
 		}
@@ -84,7 +96,7 @@ func (a *action) deleteEKSCluster(ctx context.Context, clusterName string, clien
 		return fmt.Errorf("failed to delete cluster %s: %w", clusterName, err)
 	}
 
-	if err := client.WaitUntilClusterDeletedWithContext(ctx, &eks.DescribeClusterInput{}); err != nil {
+	if err := client.WaitUntilClusterDeletedWithContext(ctx, &eks.DescribeClusterInput{Name: &clusterName}); err != nil {
 		return fmt.Errorf("failed to wait for cluster %s to be delete: %w", clusterName, err)
 	}
 
