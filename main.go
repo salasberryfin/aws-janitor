@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/rancher-sandbox/aws-janito/action"
+	"github.com/rancher-sandbox/aws-janitor/action"
 )
 
 func main() {
